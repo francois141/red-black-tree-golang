@@ -20,3 +20,18 @@ func TestRBTreeInsertSingleValue(t *testing.T) {
 	found := rbTree.Find(value)
 	assert.True(t, found)
 }
+
+func TestRBTreeSize(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	for i := 0; i < 1000; i++ {
+		rbTree.Insert(i)
+
+		found := rbTree.Find(i)
+		assert.True(t, found)
+
+		size := rbTree.Getsize()
+		assert.Equal(t, size, size)
+	}
+}
