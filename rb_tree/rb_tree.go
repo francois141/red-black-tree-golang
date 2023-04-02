@@ -1,6 +1,8 @@
 package rb_tree
 
-import "fmt"
+import (
+	"fmt"
+)
 
 const (
 	RED = iota
@@ -16,21 +18,22 @@ type RBNode[T comparable] struct {
 }
 
 type RBTree[T comparable] struct {
-	Root *RBNode[T]
+	Root    *RBNode[T]
+	NILNode *RBNode[T]
 }
 
-func InitializeNullNode[T comparable](parent *RBNode[T]) *RBNode[T] {
+func (rbTree *RBTree[T]) InitializeNullNode() *RBNode[T] {
 	return &RBNode[T]{
 		Data:   0,
-		Parent: parent,
-		Left:   nil,
-		Right:  nil,
+		Parent: nil,
+		Left:   rbTree.NILNode,
+		Right:  rbTree.NILNode,
 		Color:  RED,
 	}
 }
 
 func (rbTree *RBTree[T]) InorderTraversal(node *RBNode[T]) {
-	if node == nil {
+	if node == rbTree.NILNode {
 		return
 	}
 
@@ -82,13 +85,16 @@ func (rbTree *RBTree[T]) RightRotate(x *RBNode[T]) {
 }
 
 func (rbTree *RBTree[T]) Insert(value int) {
-	newNode := InitializeNullNode[T](nil)
+	if rbTree.Find(value) {
+		return
+	}
+	newNode := rbTree.InitializeNullNode()
 	newNode.Data = value
 
 	x := rbTree.Root
 	var y *RBNode[T] = nil
 
-	for x != nil {
+	for x != rbTree.NILNode {
 		y = x
 		if newNode.Data < x.Data {
 			x = x.Left
@@ -114,6 +120,58 @@ func (rbTree *RBTree[T]) Insert(value int) {
 	if newNode.Parent.Parent == nil {
 		return
 	}
+
+	rbTree.insertFix(newNode)
+}
+
+func (rbTree *RBTree[T]) insertFix(node *RBNode[T]) {
+	for node.Parent.Color == RED {
+		// Right case
+		if node.Parent == node.Parent.Parent.Right {
+			uncle := node.Parent.Parent.Left
+			// Case 1) We recolor only
+			if uncle.Color == RED {
+				uncle.Color = BLACK
+				node.Parent.Color = BLACK
+				node.Parent.Parent.Color = RED
+				node = node.Parent.Parent
+			} else {
+				// Case 2)
+				if node == node.Parent.Left {
+					node = node.Parent
+					rbTree.RightRotate(node)
+				}
+				// Case 2-3)
+				node.Parent.Color = BLACK
+				node.Parent.Parent.Color = RED
+				rbTree.LeftRotate(node.Parent.Parent)
+			}
+		} else {
+			uncle := node.Parent.Parent.Right
+			// Case 1)
+			if uncle.Color == RED {
+				uncle.Color = BLACK
+				node.Parent.Color = BLACK
+				node.Parent.Parent.Color = RED
+				node = node.Parent.Parent
+			} else {
+				// Case 2)
+				if node == node.Parent.Right {
+					node = node.Parent
+					rbTree.LeftRotate(node)
+				}
+				// Case 2-3)
+				node.Parent.Color = BLACK
+				node.Parent.Parent.Color = RED
+				rbTree.RightRotate(node.Parent.Parent)
+			}
+		}
+		if node == rbTree.Root {
+			break
+		}
+	}
+
+	rbTree.Root.Color = BLACK
 }
 
 func (rbTree *RBTree[T]) Find(key int) bool {
@@ -140,7 +198,7 @@ func (rbTree *RBTree[T]) Getsize() int {
 }
 
 func (rbTree *RBTree[T]) getsize(node *RBNode[T]) int {
-	if node == nil {
+	if node == rbTree.NILNode {
 		return 0
 	}
 
@@ -148,7 +206,14 @@ func (rbTree *RBTree[T]) getsize(node *RBNode[T]) int {
 }
 
 func NewEmptyRBTree[T comparable]() RBTree[T] {
+	NILNode := &RBNode[T]{
+		Color: BLACK,
+		Left:  nil,
+		Right: nil,
+	}
+
 	return RBTree[T]{
-		Root: nil,
+		Root:    NILNode,
+		NILNode: NILNode,
 	}
 }

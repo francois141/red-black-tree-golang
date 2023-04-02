@@ -25,13 +25,27 @@ func TestRBTreeSize(t *testing.T) {
 	rbTree := NewEmptyRBTree[int]()
 	assert.NotNil(t, rbTree)
 
-	for i := 0; i < 1000; i++ {
+	for i := 1; i <= 1000; i++ {
 		rbTree.Insert(i)
 
 		found := rbTree.Find(i)
 		assert.True(t, found)
 
-		size := rbTree.Getsize()
-		assert.Equal(t, size, size)
+		assert.Equal(t, i, rbTree.Getsize())
 	}
+}
+
+func TestRBRealTrace(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	rbTree.Insert(55)
+	rbTree.Insert(40)
+	rbTree.Insert(65)
+	rbTree.Insert(60)
+	rbTree.Insert(75)
+	rbTree.Insert(57)
+	rbTree.Insert(58)
+
+	assert.Equal(t, 7, rbTree.Getsize())
 }
