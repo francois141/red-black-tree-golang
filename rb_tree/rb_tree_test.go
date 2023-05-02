@@ -2,7 +2,12 @@ package rb_tree
 
 import (
 	"github.com/stretchr/testify/assert"
+	"math/rand"
 	"testing"
+)
+
+const (
+	NB_ITERATIONS int = 1000
 )
 
 func TestCreateEmptyRBTree(t *testing.T) {
@@ -48,4 +53,34 @@ func TestRBRealTrace(t *testing.T) {
 	rbTree.Insert(58)
 
 	assert.Equal(t, 7, rbTree.Getsize())
+}
+
+func TestTwoTimesSameValue(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	rbTree.Insert(55)
+	rbTree.Insert(55)
+
+	assert.Equal(t, 1, rbTree.Getsize())
+}
+
+func TestWithRandomValues(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	mp := make(map[int]struct{}, 0)
+
+	for i := 0; i < NB_ITERATIONS; i++ {
+		randomValue := rand.Intn(500)
+
+		rbTree.Insert(randomValue)
+		mp[randomValue] = struct{}{}
+
+		assert.Equal(t, len(mp), rbTree.Getsize())
+	}
+
+	for key, _ := range mp {
+		assert.True(t, rbTree.Find(key))
+	}
 }

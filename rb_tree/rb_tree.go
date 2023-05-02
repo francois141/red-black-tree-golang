@@ -10,7 +10,7 @@ const (
 )
 
 type RBNode[T comparable] struct {
-	Data   int
+	Data   *int
 	Color  int
 	Left   *RBNode[T]
 	Right  *RBNode[T]
@@ -24,7 +24,7 @@ type RBTree[T comparable] struct {
 
 func (rbTree *RBTree[T]) InitializeNullNode() *RBNode[T] {
 	return &RBNode[T]{
-		Data:   0,
+		Data:   nil,
 		Parent: nil,
 		Left:   rbTree.NILNode,
 		Right:  rbTree.NILNode,
@@ -89,14 +89,14 @@ func (rbTree *RBTree[T]) Insert(value int) {
 		return
 	}
 	newNode := rbTree.InitializeNullNode()
-	newNode.Data = value
+	newNode.Data = &value
 
 	x := rbTree.Root
 	var y *RBNode[T] = nil
 
 	for x != rbTree.NILNode {
 		y = x
-		if newNode.Data < x.Data {
+		if *newNode.Data < *x.Data {
 			x = x.Left
 		} else {
 			x = x.Right
@@ -107,7 +107,7 @@ func (rbTree *RBTree[T]) Insert(value int) {
 
 	if y == nil {
 		rbTree.Root = newNode
-	} else if newNode.Data < y.Data {
+	} else if *newNode.Data < *y.Data {
 		y.Left = newNode
 	} else {
 		y.Right = newNode
@@ -179,14 +179,14 @@ func (rbTree *RBTree[T]) Find(key int) bool {
 }
 
 func (rbTree *RBTree[T]) find(node *RBNode[T], key int) bool {
-	if node == nil {
+	if node == nil || node.Data == nil {
 		return false
 	}
-	if node.Data == key {
+	if *node.Data == key {
 		return true
 	}
 
-	if key < node.Data {
+	if key < *node.Data {
 		return rbTree.find(node.Left, key)
 	} else {
 		return rbTree.find(node.Right, key)
