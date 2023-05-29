@@ -1,6 +1,7 @@
 package rb_tree
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -203,6 +204,90 @@ func (rbTree *RBTree[T]) getsize(node *RBNode[T]) int {
 	}
 
 	return 1 + rbTree.getsize(node.Left) + rbTree.getsize(node.Right)
+}
+
+func (rbTree *RBTree[T]) Delete(key int) error {
+	return rbTree.delete(rbTree.Root, key)
+}
+
+func (rbTree *RBTree[T]) delete(node *RBNode[T], key int) error {
+	var z *RBNode[T] = nil
+
+	for node != nil {
+		if *node.Data == key {
+			z = node
+			break
+		} else if *node.Data < key {
+			node = node.Right
+		} else {
+			node = node.Left
+		}
+	}
+
+	if z == nil {
+		return errors.New("element not in red black tree")
+	}
+
+	var y, x *RBNode[T]
+	originalColor := z.Color
+
+	y = z
+
+	if z.Left == nil {
+		x = z.Right
+		rbTree.rbTransplant(z, z.Right)
+	} else if z.Right == nil {
+		x = z.Left
+		rbTree.rbTransplant(z, z.Left)
+	} else {
+		y = rbTree.minimum(z.Right)
+		originalColor = y.Color
+		x = y.Right
+		if y.Parent == z {
+			x.Parent = y
+		} else {
+			rbTree.rbTransplant(y, y.Right)
+			y.Right = z.Right
+			y.Right.Parent = y
+		}
+
+		rbTree.rbTransplant(z, y)
+	}
+
+	if originalColor == BLACK {
+		rbTree.fixDelete(x)
+	}
+
+	return nil
+}
+
+func (rbTree *RBTree[T]) rbTransplant(u *RBNode[T], v *RBNode[T]) {
+	if u.Parent == nil {
+		rbTree.Root = v
+	} else if u == u.Parent.Left {
+		u.Parent.Left = v
+	} else {
+		u.Parent.Right = v
+	}
+	v.Parent = u.Parent
+}
+
+func (rbTree *RBTree[T]) fixDelete(node *RBNode[T]) {
+	// TODO: Fill this function
+}
+
+func (rbTree *RBTree[T]) minimum(node *RBNode[T]) *RBNode[T] {
+	for node.Left != nil {
+		node = node.Left
+	}
+	return node
+}
+
+func (rbTree *RBTree[T]) maximum(node *RBNode[T]) *RBNode[T] {
+	for node.Right != nil {
+		node = node.Right
+	}
+	return node
 }
 
 func NewEmptyRBTree[T comparable]() RBTree[T] {
