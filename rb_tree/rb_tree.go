@@ -3,6 +3,7 @@ package rb_tree
 import (
 	"errors"
 	"fmt"
+	"golang.org/x/exp/constraints"
 )
 
 const (
@@ -10,15 +11,15 @@ const (
 	BLACK
 )
 
-type RBNode[T comparable] struct {
-	Data   *int
+type RBNode[T constraints.Ordered] struct {
+	Data   *T
 	Color  int
 	Left   *RBNode[T]
 	Right  *RBNode[T]
 	Parent *RBNode[T]
 }
 
-type RBTree[T comparable] struct {
+type RBTree[T constraints.Ordered] struct {
 	Root    *RBNode[T]
 	NILNode *RBNode[T]
 }
@@ -85,7 +86,7 @@ func (rbTree *RBTree[T]) RightRotate(x *RBNode[T]) {
 	x.Parent = y
 }
 
-func (rbTree *RBTree[T]) Insert(value int) {
+func (rbTree *RBTree[T]) Insert(value T) {
 	if rbTree.Find(value) {
 		return
 	}
@@ -175,11 +176,11 @@ func (rbTree *RBTree[T]) insertFix(node *RBNode[T]) {
 	rbTree.Root.Color = BLACK
 }
 
-func (rbTree *RBTree[T]) Find(key int) bool {
+func (rbTree *RBTree[T]) Find(key T) bool {
 	return rbTree.find(rbTree.Root, key)
 }
 
-func (rbTree *RBTree[T]) find(node *RBNode[T], key int) bool {
+func (rbTree *RBTree[T]) find(node *RBNode[T], key T) bool {
 	if node == nil || node.Data == nil {
 		return false
 	}
@@ -206,11 +207,11 @@ func (rbTree *RBTree[T]) getsize(node *RBNode[T]) int {
 	return 1 + rbTree.getsize(node.Left) + rbTree.getsize(node.Right)
 }
 
-func (rbTree *RBTree[T]) Delete(key int) error {
+func (rbTree *RBTree[T]) Delete(key T) error {
 	return rbTree.delete(rbTree.Root, key)
 }
 
-func (rbTree *RBTree[T]) delete(node *RBNode[T], key int) error {
+func (rbTree *RBTree[T]) delete(node *RBNode[T], key T) error {
 	var z *RBNode[T] = nil
 
 	for node != nil {
@@ -290,7 +291,7 @@ func (rbTree *RBTree[T]) maximum(node *RBNode[T]) *RBNode[T] {
 	return node
 }
 
-func NewEmptyRBTree[T comparable]() RBTree[T] {
+func NewEmptyRBTree[T constraints.Ordered]() RBTree[T] {
 	NILNode := &RBNode[T]{
 		Color: BLACK,
 		Left:  nil,
