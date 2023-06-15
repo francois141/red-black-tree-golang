@@ -253,6 +253,9 @@ func (rbTree *RBTree[T]) delete(node *RBNode[T], key T) error {
 		}
 
 		rbTree.rbTransplant(z, y)
+		y.Left = z.Left
+		y.Left.Parent = y
+		y.Color = z.Color
 	}
 
 	if originalColor == BLACK {
