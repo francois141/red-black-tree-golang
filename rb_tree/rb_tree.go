@@ -289,10 +289,17 @@ func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
 				rbTree.LeftRotate(x.Parent)
 				w = x.Parent.Right
 			}
+			// Case 2
+			if w.Left.Color == BLACK && w.Right.Color == BLACK {
+				w.Color = RED
+				x = x.Parent
+			}
 		} else if x == x.Parent.Right {
 
 		}
 	}
+
+	rbTree.Root.Color = BLACK
 }
 
 func (rbTree *RBTree[T]) minimum(node *RBNode[T]) *RBNode[T] {
