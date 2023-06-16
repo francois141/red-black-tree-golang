@@ -276,8 +276,23 @@ func (rbTree *RBTree[T]) rbTransplant(u *RBNode[T], v *RBNode[T]) {
 	v.Parent = u.Parent
 }
 
-func (rbTree *RBTree[T]) fixDelete(node *RBNode[T]) {
-	// TODO: Fill this function
+func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
+	var w *RBNode[T]
+
+	for x != rbTree.Root && x.Color == BLACK {
+		if x == x.Parent.Left {
+			w = x.Parent.Right
+			// Case 1
+			if w.Color == RED {
+				w.Color = BLACK
+				x.Parent.Color = RED
+				rbTree.LeftRotate(x.Parent)
+				w = x.Parent.Right
+			}
+		} else if x == x.Parent.Right {
+
+		}
+	}
 }
 
 func (rbTree *RBTree[T]) minimum(node *RBNode[T]) *RBNode[T] {
