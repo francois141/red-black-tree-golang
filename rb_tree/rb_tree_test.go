@@ -84,3 +84,18 @@ func TestWithRandomValues(t *testing.T) {
 		assert.True(t, rbTree.Find(key))
 	}
 }
+
+func TestRBTreeSimpleDelete(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	value := 4
+
+	rbTree.Insert(value)
+	found := rbTree.Find(value)
+	assert.True(t, found)
+
+	rbTree.Delete(value)
+	found = rbTree.Find(value)
+	assert.False(t, found)
+}
