@@ -293,7 +293,17 @@ func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
 			if w.Left.Color == BLACK && w.Right.Color == BLACK {
 				w.Color = RED
 				x = x.Parent
+			} else {
+				// Case 3
+				if w.Right.Color == BLACK {
+					w.Left.Color = BLACK
+					w.Color = RED
+					rbTree.RightRotate(w)
+					w = x.Parent.Right
+				}
+				// Case 4
 			}
+
 		} else if x == x.Parent.Right {
 
 		}
