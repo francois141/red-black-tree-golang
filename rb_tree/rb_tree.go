@@ -314,7 +314,7 @@ func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
 		}
 	}
 
-	rbTree.Root.Color = BLACK
+	x.Color = BLACK
 }
 
 func (rbTree *RBTree[T]) minimum(node *RBNode[T]) *RBNode[T] {
