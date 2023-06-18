@@ -2,7 +2,6 @@ package rb_tree
 
 import (
 	"errors"
-	"fmt"
 	"golang.org/x/exp/constraints"
 )
 
@@ -40,7 +39,7 @@ func (rbTree *RBTree[T]) InorderTraversal(node *RBNode[T]) {
 	}
 
 	rbTree.InorderTraversal(node.Left)
-	fmt.Printf("%d ", *node.Data)
+	//fmt.Printf("%d ", *node.Data)
 	rbTree.InorderTraversal(node.Right)
 }
 
@@ -234,10 +233,10 @@ func (rbTree *RBTree[T]) delete(node *RBNode[T], key T) error {
 
 	y = z
 
-	if z.Left == nil {
+	if z.Left == rbTree.NILNode {
 		x = z.Right
 		rbTree.rbTransplant(z, z.Right)
-	} else if z.Right == nil {
+	} else if z.Right == rbTree.NILNode {
 		x = z.Left
 		rbTree.rbTransplant(z, z.Left)
 	} else {
@@ -310,7 +309,33 @@ func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
 			}
 
 		} else if x == x.Parent.Right {
-
+			w = x.Parent.Left
+			// Case 1
+			if w.Color == RED {
+				w.Color = BLACK
+				x.Parent.Color = RED
+				rbTree.RightRotate(x.Parent)
+				w = x.Parent.Left
+			}
+			// Case 2
+			if w.Right.Color == BLACK && w.Left.Color == BLACK {
+				w.Color = RED
+				x = x.Parent
+			} else {
+				// Case 3
+				if w.Left.Color == BLACK {
+					w.Right.Color = BLACK
+					w.Color = RED
+					rbTree.LeftRotate(w)
+					w = x.Parent.Left
+				}
+				// Case 4
+				w.Color = x.Parent.Color
+				x.Parent.Color = BLACK
+				w.Left.Color = BLACK
+				rbTree.RightRotate(x.Parent)
+				x = rbTree.Root
+			}
 		}
 	}
 
@@ -318,14 +343,14 @@ func (rbTree *RBTree[T]) fixDelete(x *RBNode[T]) {
 }
 
 func (rbTree *RBTree[T]) minimum(node *RBNode[T]) *RBNode[T] {
-	for node.Left != nil {
+	for node.Left != rbTree.NILNode {
 		node = node.Left
 	}
 	return node
 }
 
 func (rbTree *RBTree[T]) maximum(node *RBNode[T]) *RBNode[T] {
-	for node.Right != nil {
+	for node.Right != rbTree.NILNode {
 		node = node.Right
 	}
 	return node

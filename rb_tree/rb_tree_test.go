@@ -99,3 +99,28 @@ func TestRBTreeSimpleDelete(t *testing.T) {
 	found = rbTree.Find(value)
 	assert.False(t, found)
 }
+
+func TestRBRealTraceDelete(t *testing.T) {
+	rbTree := NewEmptyRBTree[int]()
+	assert.NotNil(t, rbTree)
+
+	rbTree.Insert(55)
+	rbTree.Insert(40)
+	rbTree.Insert(65)
+	rbTree.Insert(60)
+	rbTree.Insert(75)
+	rbTree.Insert(57)
+	rbTree.Insert(58)
+
+	assert.Equal(t, 7, rbTree.Getsize())
+
+	rbTree.Delete(55)
+	rbTree.Delete(40)
+	rbTree.Delete(65)
+	rbTree.Delete(60)
+	rbTree.Delete(75)
+	rbTree.Delete(57)
+	rbTree.Delete(58)
+
+	assert.Equal(t, 0, rbTree.Getsize())
+}
