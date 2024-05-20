@@ -1,5 +1,7 @@
 package heap
 
+import "errors"
+
 type Heap struct {
 	arr []int
 }
@@ -14,7 +16,6 @@ func (heap *Heap) swap(a int, b int) {
 	heap.arr[b] = tmp
 }
 
-// TODO: Check bounds
 func (heap *Heap) Push(value int) {
 	heap.arr = append(heap.arr, value)
 
@@ -38,8 +39,11 @@ func (heap *Heap) Push(value int) {
 	}
 }
 
-// TODO: Check bounds
-func (heap *Heap) Pop() int {
+func (heap *Heap) Pop() (int, error) {
+	if len(heap.arr) == 0 {
+		return 0, errors.New("heap is empty")
+	}
+
 	value := heap.arr[0]
 
 	heap.swap(0, len(heap.arr)-1)
@@ -47,7 +51,7 @@ func (heap *Heap) Pop() int {
 
 	heap.heapify(0)
 
-	return value
+	return value, nil
 }
 
 func (heap *Heap) heapify(idx int) {

@@ -13,9 +13,13 @@ func TestSimpleHeap(t *testing.T) {
 	}
 
 	for i := 0; i < 10; i++ {
-		value := heap.Pop()
+		value, err := heap.Pop()
+		assert.NoError(t, err)
 		assert.Equal(t, i, value)
 	}
+
+	_, err := heap.Pop()
+	assert.Error(t, err)
 }
 
 type oracle struct {
@@ -55,6 +59,8 @@ func TestVsOracle(t *testing.T) {
 	}
 
 	for i := 0; i < runs; i++ {
-		assert.Equal(t, heap.Pop(), oracle.Pop())
+		value, err := heap.Pop()
+		assert.NoError(t, err)
+		assert.Equal(t, value, oracle.Pop())
 	}
 }
