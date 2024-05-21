@@ -68,7 +68,6 @@ func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode
 
 func (tree *BTree) Insert(key int) {
 	// Check if we need to split the root first
-
 	if len(tree.root.keys) == 2*t-1 {
 		// Get old root
 		oldRoot := tree.root
@@ -83,12 +82,38 @@ func (tree *BTree) Insert(key int) {
 		tree.root = newRoot
 	}
 
+	// If root is empty
+	if len(tree.root.keys) == 0 {
+		tree.root.keys = append(tree.root.keys, key)
+		return
+	}
 	// Invariant: root isn't full here
-	tree._insert(key)
+	tree._insert(tree.root, key)
 }
 
-func (tree *BTree) _insert(key int) {
-	// TODO: Implement this code
+func (tree *BTree) _insert(current *BTreeNode, key int) {
+	if current.isLeaf {
+		idx := len(current.keys) - 1
+		current.keys = append(current.keys, 0)
+		for current.keys[idx] > key {
+			current.keys[idx+1] = current.keys[idx]
+			idx--
+		}
+		current.keys[idx+1] = key
+	} else {
+		idx := 0
+		for idx < len(current.keys) && current.keys[idx] < key {
+			idx++
+		}
+		child := current.childrens[idx]
+		if len(child.keys) == 2*t-1 {
+			tree._splitNode(current, idx, child)
+			if key > current.keys[idx] {
+				child = current.childrens[idx+1]
+			}
+		}
+		tree._insert(child, key)
+	}
 }
 
 func (tree *BTree) Search(key int) bool {
