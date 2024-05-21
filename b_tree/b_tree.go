@@ -36,7 +36,7 @@ func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode
 
 	// Copy from child / keys to new node
 	for i := t; i < 2*t-1; i++ {
-		otherChild.keys = append(otherChild.keys, current.keys[i])
+		otherChild.keys = append(otherChild.keys, child.keys[i])
 	}
 
 	if !otherChild.isLeaf {
@@ -46,17 +46,17 @@ func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode
 	}
 
 	// Remove values from the original child
-	medianValue := child.keys[position]
+	medianValue := child.keys[t-1]
 	child.keys = child.keys[:t-1]
 	child.childrens = child.childrens[:t]
 
 	// Alter state of x
-	current.keys = append(current.keys, current.keys[len(current.keys)-1])
+	current.keys = append(current.keys, 0)
 	for i := len(current.keys) - 2; i >= position; i-- {
 		current.keys[i+1] = current.keys[i]
 	}
 
-	current.childrens = append(current.childrens, current.childrens[len(current.childrens)-1])
+	current.childrens = append(current.childrens, NewBTreeNode())
 	for i := len(current.childrens) - 2; i >= position+1; i-- {
 		current.childrens[i+1] = current.childrens[i]
 	}
@@ -116,7 +116,25 @@ func (tree *BTree) _insert(current *BTreeNode, key int) {
 	}
 }
 
-func (tree *BTree) Search(key int) bool {
-	// TODO: Implement this code
+func (tree *BTree) Find(key int) bool {
+	return tree._find(tree.root, key)
+}
+
+func (tree *BTree) _find(current *BTreeNode, key int) bool {
+	for _, value := range current.keys {
+		if value == key {
+			return true
+		}
+	}
+
+	if !current.isLeaf {
+		idx := 0
+		for idx < len(current.keys) && current.keys[idx] < key {
+			idx++
+		}
+
+		return tree._find(current.childrens[idx], key)
+	}
+
 	return false
 }
