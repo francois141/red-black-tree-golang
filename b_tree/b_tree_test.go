@@ -28,3 +28,20 @@ func TestBTree_Search(t *testing.T) {
 		assert.False(t, tree.Find(i+1))
 	}
 }
+
+func TestBTree_Delete(t *testing.T) {
+	tree := NewBTree()
+	assert.NotNil(t, tree)
+
+	tree.Insert(0)
+	tree.Delete(0)
+	assert.False(t, tree.Find(0))
+
+	tree.Insert(0)
+	tree.Insert(1)
+
+	tree.Delete(0)
+	tree.Delete(1)
+	assert.False(t, tree.Find(0))
+	assert.False(t, tree.Find(1))
+}

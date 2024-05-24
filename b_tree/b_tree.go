@@ -117,10 +117,10 @@ func (tree *BTree) _insert(current *BTreeNode, key int) {
 }
 
 func (tree *BTree) Find(key int) bool {
-	return tree._find(tree.root, key)
+	return tree.find(tree.root, key)
 }
 
-func (tree *BTree) _find(current *BTreeNode, key int) bool {
+func (tree *BTree) find(current *BTreeNode, key int) bool {
 	for _, value := range current.keys {
 		if value == key {
 			return true
@@ -133,8 +133,164 @@ func (tree *BTree) _find(current *BTreeNode, key int) bool {
 			idx++
 		}
 
-		return tree._find(current.childrens[idx], key)
+		return tree.find(current.childrens[idx], key)
 	}
 
 	return false
+}
+
+func (tree *BTree) Delete(key int) {
+	tree.delete(tree.root, key)
+}
+
+func (tree *BTree) delete(current *BTreeNode, key int) {
+	idx := tree.findKey(tree.root, key)
+
+	if idx < len(tree.root.keys) && tree.root.keys[idx] == key {
+		if tree.root.isLeaf {
+			tree.removeFromLeaf(tree.root, key)
+		} else {
+			tree.removeFromNonLeaf(tree.root, key)
+		}
+
+		return
+	}
+
+	// Case 3 - node isn't present - make sure child has t-1 values at least
+	if current.isLeaf {
+		return
+	}
+
+	if len(current.childrens[idx].keys) < t {
+		tree.fill(current, idx)
+	}
+
+	// If we are in the last ==> reduce len by -1 as we squashed it with merge
+	tree.delete(current.childrens[min(idx, len(current.childrens)-1)], key)
+}
+
+func (tree *BTree) fill(current *BTreeNode, idx int) {
+	if idx > 0 && len(current.childrens[idx-1].keys) >= t {
+		tree.borrowFromPred(current, idx)
+		return
+	}
+
+	if idx < len(current.childrens)-1 && len(current.childrens[idx+1].keys) >= t {
+		tree.borrowFromSucc(current, idx)
+		return
+	}
+}
+
+func (tree *BTree) borrowFromPred(current *BTreeNode, idx int) {
+	child := current.childrens[idx]
+	prev := current.childrens[idx-1]
+
+	// Borrow
+	child.keys = append([]int{current.keys[idx-1]}, child.keys...)
+	// TODO: Is it correct? - Do I need an extra if statement?
+	child.childrens = append([]*BTreeNode{prev.childrens[len(prev.childrens)-1]}, child.childrens...)
+
+	// Change key of parent
+	current.keys[idx-1] = prev.keys[len(prev.keys)-1]
+
+	// Remove values from prev
+	prev.keys = prev.keys[:len(prev.keys)-1]
+	prev.childrens = prev.childrens[:len(prev.childrens)-1]
+}
+
+func (tree *BTree) borrowFromSucc(current *BTreeNode, idx int) {
+	child := current.childrens[idx]
+	next := current.childrens[idx+1]
+
+	// Borrow
+	child.keys = append(child.keys, current.keys[idx])
+	child.childrens = append(child.childrens, next.childrens[0])
+
+	// Change the key of the parent
+	current.keys[idx] = next.keys[0]
+
+	// Remove values from next
+	next.keys = next.keys[1:]
+	next.childrens = next.childrens[1:]
+}
+
+func (tree *BTree) findKey(current *BTreeNode, key int) int {
+	idx := 0
+	for idx < len(current.keys) && current.keys[idx] < key {
+		idx++
+	}
+
+	return idx
+}
+
+func (tree *BTree) removeFromLeaf(current *BTreeNode, idx int) {
+	if !current.isLeaf {
+		panic("Should be leaf")
+	}
+
+	for i := idx + 1; i < len(current.keys); i++ {
+		current.keys[i-1] = current.keys[i]
+	}
+	current.keys = current.keys[:len(current.keys)-1]
+}
+
+func (tree *BTree) getPredecessor(current *BTreeNode) int {
+	for !current.isLeaf {
+		current = current.childrens[len(current.childrens)-1]
+	}
+
+	return current.keys[len(current.keys)-1]
+}
+
+func (tree *BTree) getSuccessor(current *BTreeNode) int {
+	for !current.isLeaf {
+		current = current.childrens[0]
+	}
+
+	return current.keys[0]
+}
+
+func (tree *BTree) removeFromNonLeaf(current *BTreeNode, idx int) {
+	if current.isLeaf {
+		panic("Should be non leaf")
+	}
+
+	// Case 2a - left has at least t nodes - swap values and recursive delete
+	if len(current.childrens[idx].childrens) > t {
+		value := tree.getPredecessor(current.childrens[idx+1])
+		current.keys[idx] = value
+		tree.delete(current.childrens[idx], value)
+		return
+	}
+
+	// Case 2b - right has at least t nodes - swap values and recursive delete
+	if len(current.childrens[idx+1].childrens) > t {
+		value := tree.getSuccessor(current.childrens[idx+1])
+		current.keys[idx] = value
+		tree.delete(current.childrens[idx+1], value)
+		return
+	}
+
+	// Case 2c
+	key := current.keys[idx]
+	tree.merge(current, idx)
+	tree.delete(current, key)
+}
+
+func (tree *BTree) merge(current *BTreeNode, idx int) {
+	// Merge both childrens together
+	c1 := current.childrens[idx]
+	c2 := current.childrens[idx+1]
+
+	// Merge keys
+	c1.keys = append(c1.keys, current.keys[idx])
+	c1.keys = append(c1.keys, c2.keys...)
+
+	// Merge childrens
+	// TODO: Is it correct?
+	c1.childrens = append(c1.childrens, c2.childrens...)
+
+	// Alter now the state of current
+	current.keys = append(current.keys[:idx], current.keys[idx+1:]...)
+	current.childrens = append(current.childrens[:idx], current.childrens[idx+1:]...)
 }
