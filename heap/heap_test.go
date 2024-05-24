@@ -1,6 +1,7 @@
 package heap
 
 import (
+	oracle2 "francois141/rbtree/oracle"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -22,32 +23,10 @@ func TestSimpleHeap(t *testing.T) {
 	assert.Error(t, err)
 }
 
-type oracle struct {
-	mp map[int]int
-}
-
-func (o *oracle) Push(val int) {
-	o.mp[val]++
-}
-
-func (o *oracle) Pop() int {
-	best := 100000
-	for key, _ := range o.mp {
-		best = min(best, key)
-	}
-
-	o.mp[best]--
-	if o.mp[best] == 0 {
-		delete(o.mp, best)
-	}
-
-	return best
-}
-
 func TestVsOracle(t *testing.T) {
 	runs := 1000000
 	heap := NewHeap()
-	oracle := oracle{make(map[int]int)}
+	oracle := oracle2.NewHeapOracle()
 
 	gen := 1
 
@@ -61,6 +40,7 @@ func TestVsOracle(t *testing.T) {
 	for i := 0; i < runs; i++ {
 		value, err := heap.Pop()
 		assert.NoError(t, err)
-		assert.Equal(t, value, oracle.Pop())
+		oracleValue, _ := oracle.Pop()
+		assert.Equal(t, value, oracleValue)
 	}
 }

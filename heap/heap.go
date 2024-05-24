@@ -71,3 +71,7 @@ func (heap *Heap) heapify(idx int) {
 		heap.heapify(current)
 	}
 }
+
+func (heap *Heap) Size() int {
+	return len(heap.arr)
+}
