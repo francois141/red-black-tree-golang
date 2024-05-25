@@ -144,13 +144,13 @@ func (tree *BTree) Delete(key int) {
 }
 
 func (tree *BTree) delete(current *BTreeNode, key int) {
-	idx := tree.findKey(tree.root, key)
+	idx := tree.findKey(current, key)
 
-	if idx < len(tree.root.keys) && tree.root.keys[idx] == key {
-		if tree.root.isLeaf {
-			tree.removeFromLeaf(tree.root, key)
+	if idx < len(current.keys) && current.keys[idx] == key {
+		if current.isLeaf {
+			tree.removeFromLeaf(current, idx)
 		} else {
-			tree.removeFromNonLeaf(tree.root, key)
+			tree.removeFromNonLeaf(current, idx)
 		}
 
 		return
@@ -187,15 +187,21 @@ func (tree *BTree) borrowFromPred(current *BTreeNode, idx int) {
 
 	// Borrow
 	child.keys = append([]int{current.keys[idx-1]}, child.keys...)
-	// TODO: Is it correct? - Do I need an extra if statement?
-	child.childrens = append([]*BTreeNode{prev.childrens[len(prev.childrens)-1]}, child.childrens...)
+	if len(prev.childrens) > 0 {
+		child.childrens = append([]*BTreeNode{prev.childrens[len(prev.childrens)-1]}, child.childrens...)
+	}
 
 	// Change key of parent
 	current.keys[idx-1] = prev.keys[len(prev.keys)-1]
 
 	// Remove values from prev
-	prev.keys = prev.keys[:len(prev.keys)-1]
-	prev.childrens = prev.childrens[:len(prev.childrens)-1]
+	if len(prev.keys) > 0 {
+		prev.keys = prev.keys[:len(prev.keys)-1]
+	}
+
+	if len(prev.childrens) > 0 {
+		prev.childrens = prev.childrens[:len(prev.childrens)-1]
+	}
 }
 
 func (tree *BTree) borrowFromSucc(current *BTreeNode, idx int) {
@@ -204,14 +210,21 @@ func (tree *BTree) borrowFromSucc(current *BTreeNode, idx int) {
 
 	// Borrow
 	child.keys = append(child.keys, current.keys[idx])
-	child.childrens = append(child.childrens, next.childrens[0])
+	if len(next.childrens) > 0 {
+		child.childrens = append(child.childrens, next.childrens[0])
+	}
 
 	// Change the key of the parent
 	current.keys[idx] = next.keys[0]
 
 	// Remove values from next
-	next.keys = next.keys[1:]
-	next.childrens = next.childrens[1:]
+	if len(next.keys) >= 1 {
+		next.keys = next.keys[1:]
+	}
+
+	if len(next.childrens) >= 1 {
+		next.childrens = next.childrens[1:]
+	}
 }
 
 func (tree *BTree) findKey(current *BTreeNode, key int) int {

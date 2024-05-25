@@ -33,15 +33,15 @@ func TestBTree_Delete(t *testing.T) {
 	tree := NewBTree()
 	assert.NotNil(t, tree)
 
-	tree.Insert(0)
-	tree.Delete(0)
-	assert.False(t, tree.Find(0))
+	size := 1500
 
-	tree.Insert(0)
-	tree.Insert(1)
+	for i := 0; i < size; i++ {
+		tree.Insert(i)
+		assert.True(t, tree.Find(i))
+	}
 
-	tree.Delete(0)
-	tree.Delete(1)
-	assert.False(t, tree.Find(0))
-	assert.False(t, tree.Find(1))
+	for i := 0; i < size; i++ {
+		tree.Delete(i)
+		assert.False(t, tree.Find(i), i)
+	}
 }
