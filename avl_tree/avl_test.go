@@ -19,3 +19,17 @@ func TestInsert(t *testing.T) {
 		assert.False(t, tree.Find(i+1))
 	}
 }
+
+func TestDelete(t *testing.T) {
+	tree := New()
+
+	size := 20000
+	for i := 0; i < size; i++ {
+		tree.Insert(i)
+	}
+
+	for i := 0; i < size; i++ {
+		tree.Delete(i)
+		assert.False(t, tree.Find(i))
+	}
+}

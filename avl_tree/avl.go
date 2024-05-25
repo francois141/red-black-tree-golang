@@ -103,7 +103,65 @@ func (avl *avl) rightRotate(current *avlNode) *avlNode {
 	return y
 }
 
-func (avl *avl) Delete(value int) {}
+func (avl *avl) Delete(value int) {
+	avl.root = avl.delete(avl.root, value)
+}
+
+func (avl *avl) nextValue(current *avlNode, value int) int {
+	for current.left != nil {
+		current = current.left
+	}
+
+	return current.value
+}
+
+func (avl *avl) delete(current *avlNode, value int) *avlNode {
+	if current == nil {
+		return current
+	} else if value < current.value {
+		current.left = avl.delete(current.left, value)
+	} else if value > current.value {
+		current.right = avl.delete(current.right, value)
+	} else {
+		if current.left == nil && current.right == nil {
+			// Case 1 - leaf
+			return nil
+		} else if current.left == nil {
+			// Case 2 - one child
+			current = current.right
+		} else if current.right == nil {
+			// Case 2 - one child
+			current = current.left
+		} else {
+			// Case 3 - two childrens
+			succ := avl.nextValue(current.right, value)
+			current.value = succ
+			current.right = avl.delete(current.right, succ)
+		}
+	}
+
+	// Update height
+	current.height = 1 + max(avl.getHeight(current.left), avl.getHeight(current.right))
+
+	// Rebalance phase
+	balance := avl.getBalanceFactor(current)
+	if balance > 1 {
+		if avl.getBalanceFactor(current.left) < 0 {
+			current.left = avl.leftRotate(current.left)
+		}
+		return avl.rightRotate(current)
+	}
+
+	// Right subtree is bigger
+	if balance < -1 {
+		if avl.getBalanceFactor(current.right) > 0 {
+			current.right = avl.rightRotate(current.right)
+		}
+		return avl.leftRotate(current)
+	}
+
+	return current
+}
 
 func (avl *avl) Find(value int) bool {
 	return avl.find(avl.root, value)
