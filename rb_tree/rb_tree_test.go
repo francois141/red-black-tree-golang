@@ -36,7 +36,7 @@ func TestRBTreeSize(t *testing.T) {
 		found := rbTree.Find(i)
 		assert.True(t, found)
 
-		assert.Equal(t, i, rbTree.Getsize())
+		assert.Equal(t, i, rbTree.Size())
 	}
 }
 
@@ -52,7 +52,7 @@ func TestRBRealTrace(t *testing.T) {
 	rbTree.Insert(57)
 	rbTree.Insert(58)
 
-	assert.Equal(t, 7, rbTree.Getsize())
+	assert.Equal(t, 7, rbTree.Size())
 }
 
 func TestTwoTimesSameValue(t *testing.T) {
@@ -62,7 +62,7 @@ func TestTwoTimesSameValue(t *testing.T) {
 	rbTree.Insert(55)
 	rbTree.Insert(55)
 
-	assert.Equal(t, 1, rbTree.Getsize())
+	assert.Equal(t, 1, rbTree.Size())
 }
 
 func TestWithRandomValues(t *testing.T) {
@@ -77,7 +77,7 @@ func TestWithRandomValues(t *testing.T) {
 		rbTree.Insert(randomValue)
 		mp[randomValue] = struct{}{}
 
-		assert.Equal(t, len(mp), rbTree.Getsize())
+		assert.Equal(t, len(mp), rbTree.Size())
 	}
 
 	for key, _ := range mp {
@@ -112,7 +112,7 @@ func TestRBRealTraceDelete(t *testing.T) {
 	rbTree.Insert(57)
 	rbTree.Insert(58)
 
-	assert.Equal(t, 7, rbTree.Getsize())
+	assert.Equal(t, 7, rbTree.Size())
 
 	rbTree.Delete(55)
 	rbTree.Delete(40)
@@ -122,5 +122,5 @@ func TestRBRealTraceDelete(t *testing.T) {
 	rbTree.Delete(57)
 	rbTree.Delete(58)
 
-	assert.Equal(t, 0, rbTree.Getsize())
+	assert.Equal(t, 0, rbTree.Size())
 }

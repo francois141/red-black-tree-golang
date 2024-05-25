@@ -33,3 +33,13 @@ func TestDelete(t *testing.T) {
 		assert.False(t, tree.Find(i))
 	}
 }
+
+func TestSize(t *testing.T) {
+	tree := New()
+
+	size := 1
+	for i := 1; i <= size; i++ {
+		tree.Insert(i)
+		assert.Equal(t, i, tree.Size())
+	}
+}

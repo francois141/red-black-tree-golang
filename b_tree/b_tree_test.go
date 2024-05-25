@@ -45,3 +45,13 @@ func TestBTree_Delete(t *testing.T) {
 		assert.False(t, tree.Find(i), i)
 	}
 }
+
+func TestBTree_Size(t *testing.T) {
+	tree := NewBTree()
+	assert.NotNil(t, tree)
+
+	for i := 1; i < 1000; i++ {
+		tree.Insert(i)
+		assert.Equal(t, i, tree.Size())
+	}
+}

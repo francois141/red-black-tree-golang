@@ -307,3 +307,21 @@ func (tree *BTree) merge(current *BTreeNode, idx int) {
 	current.keys = append(current.keys[:idx], current.keys[idx+1:]...)
 	current.childrens = append(current.childrens[:idx], current.childrens[idx+1:]...)
 }
+
+func (tree *BTree) Size() int {
+	return tree.size(tree.root)
+}
+
+func (tree *BTree) size(current *BTreeNode) int {
+	if current == nil {
+		return 0
+	}
+
+	output := len(current.keys)
+
+	for _, child := range current.childrens {
+		output += tree.size(child)
+	}
+
+	return output
+}

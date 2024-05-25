@@ -194,16 +194,16 @@ func (rbTree *RBTree[T]) find(node *RBNode[T], key T) bool {
 	}
 }
 
-func (rbTree *RBTree[T]) Getsize() int {
-	return rbTree.getsize(rbTree.Root)
+func (rbTree *RBTree[T]) Size() int {
+	return rbTree.size(rbTree.Root)
 }
 
-func (rbTree *RBTree[T]) getsize(node *RBNode[T]) int {
+func (rbTree *RBTree[T]) size(node *RBNode[T]) int {
 	if node == rbTree.NILNode {
 		return 0
 	}
 
-	return 1 + rbTree.getsize(node.Left) + rbTree.getsize(node.Right)
+	return 1 + rbTree.size(node.Left) + rbTree.size(node.Right)
 }
 
 func (rbTree *RBTree[T]) Delete(key T) error {

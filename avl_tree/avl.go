@@ -14,7 +14,7 @@ type avl struct {
 
 func New() *avl {
 	return &avl{
-		root: &avlNode{},
+		root: nil,
 	}
 }
 
@@ -179,4 +179,16 @@ func (avl *avl) find(current *avlNode, value int) bool {
 	} else {
 		return true
 	}
+}
+
+func (avl *avl) Size() int {
+	return avl.size(avl.root)
+}
+
+func (avl *avl) size(current *avlNode) int {
+	if current == nil {
+		return 0
+	}
+
+	return 1 + avl.size(current.left) + avl.size(current.right)
 }
