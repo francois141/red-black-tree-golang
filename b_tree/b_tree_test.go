@@ -6,11 +6,11 @@ import (
 )
 
 func TestBTree_Creation(t *testing.T) {
-	assert.NotNil(t, NewBTree())
+	assert.NotNil(t, NewBTree[int]())
 }
 
 func TestBTree_Insertion(t *testing.T) {
-	tree := NewBTree()
+	tree := NewBTree[int]()
 	assert.NotNil(t, tree)
 
 	for i := 0; i < 1; i++ {
@@ -19,7 +19,7 @@ func TestBTree_Insertion(t *testing.T) {
 }
 
 func TestBTree_Search(t *testing.T) {
-	tree := NewBTree()
+	tree := NewBTree[int]()
 	assert.NotNil(t, tree)
 
 	for i := 1; i < 1000; i++ {
@@ -30,7 +30,7 @@ func TestBTree_Search(t *testing.T) {
 }
 
 func TestBTree_Delete(t *testing.T) {
-	tree := NewBTree()
+	tree := NewBTree[int]()
 	assert.NotNil(t, tree)
 
 	size := 1500
@@ -47,7 +47,7 @@ func TestBTree_Delete(t *testing.T) {
 }
 
 func TestBTree_Size(t *testing.T) {
-	tree := NewBTree()
+	tree := NewBTree[int]()
 	assert.NotNil(t, tree)
 
 	for i := 1; i < 1000; i++ {

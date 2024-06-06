@@ -37,7 +37,17 @@ func TestDelete(t *testing.T) {
 func TestSize(t *testing.T) {
 	tree := New()
 
-	size := 1
+	size := 20000
+	for i := 0; i < size; i++ {
+		tree.Insert(i)
+		tree.Insert(i)
+	}
+
+	for i := 0; i < size; i++ {
+		tree.Delete(i)
+		assert.False(t, tree.Find(i))
+	}
+
 	for i := 1; i <= size; i++ {
 		tree.Insert(i)
 		assert.Equal(t, i, tree.Size())

@@ -1,37 +1,38 @@
 package b_tree
 
+import "golang.org/x/exp/constraints"
+
 const (
 	t int = 3
 )
 
-// TODO: I could make the data structure generic
-type BTreeNode struct {
+type BTreeNode[T constraints.Ordered] struct {
 	isLeaf    bool
-	childrens []*BTreeNode
+	childrens []*BTreeNode[T]
 	keys      []int
 }
 
-func NewBTreeNode() *BTreeNode {
-	return &BTreeNode{
+func NewBTreeNode[T constraints.Ordered]() *BTreeNode[T] {
+	return &BTreeNode[T]{
 		isLeaf:    true,
-		childrens: make([]*BTreeNode, 0, 2*t-1),
+		childrens: make([]*BTreeNode[T], 0, 2*t-1),
 		keys:      make([]int, 0, 2*t),
 	}
 }
 
-type BTree struct {
-	root *BTreeNode
+type BTree[T constraints.Ordered] struct {
+	root *BTreeNode[T]
 }
 
-func NewBTree() *BTree {
-	return &BTree{
-		root: NewBTreeNode(),
+func NewBTree[T constraints.Ordered]() *BTree[T] {
+	return &BTree[T]{
+		root: NewBTreeNode[T](),
 	}
 }
 
-func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode) {
+func (tree *BTree[T]) _splitNode(current *BTreeNode[T], position int, child *BTreeNode[T]) {
 	// Allocate new node
-	otherChild := NewBTreeNode()
+	otherChild := NewBTreeNode[T]()
 	otherChild.isLeaf = child.isLeaf
 
 	// Copy from child / keys to new node
@@ -56,7 +57,7 @@ func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode
 		current.keys[i+1] = current.keys[i]
 	}
 
-	current.childrens = append(current.childrens, NewBTreeNode())
+	current.childrens = append(current.childrens, NewBTreeNode[T]())
 	for i := len(current.childrens) - 2; i >= position+1; i-- {
 		current.childrens[i+1] = current.childrens[i]
 	}
@@ -66,12 +67,12 @@ func (tree *BTree) _splitNode(current *BTreeNode, position int, child *BTreeNode
 	current.childrens[position+1] = otherChild
 }
 
-func (tree *BTree) Insert(key int) {
+func (tree *BTree[T]) Insert(key int) {
 	// Check if we need to split the root first
 	if len(tree.root.keys) == 2*t-1 {
 		// Get old root
 		oldRoot := tree.root
-		newRoot := NewBTreeNode()
+		newRoot := NewBTreeNode[T]()
 		newRoot.isLeaf = false
 		newRoot.childrens = append(newRoot.childrens, oldRoot)
 
@@ -91,7 +92,7 @@ func (tree *BTree) Insert(key int) {
 	tree._insert(tree.root, key)
 }
 
-func (tree *BTree) _insert(current *BTreeNode, key int) {
+func (tree *BTree[T]) _insert(current *BTreeNode[T], key int) {
 	if current.isLeaf {
 		idx := len(current.keys) - 1
 		current.keys = append(current.keys, 0)
@@ -116,11 +117,11 @@ func (tree *BTree) _insert(current *BTreeNode, key int) {
 	}
 }
 
-func (tree *BTree) Find(key int) bool {
+func (tree *BTree[T]) Find(key int) bool {
 	return tree.find(tree.root, key)
 }
 
-func (tree *BTree) find(current *BTreeNode, key int) bool {
+func (tree *BTree[T]) find(current *BTreeNode[T], key int) bool {
 	for _, value := range current.keys {
 		if value == key {
 			return true
@@ -139,11 +140,11 @@ func (tree *BTree) find(current *BTreeNode, key int) bool {
 	return false
 }
 
-func (tree *BTree) Delete(key int) {
+func (tree *BTree[T]) Delete(key int) {
 	tree.delete(tree.root, key)
 }
 
-func (tree *BTree) delete(current *BTreeNode, key int) {
+func (tree *BTree[T]) delete(current *BTreeNode[T], key int) {
 	idx := tree.findKey(current, key)
 
 	if idx < len(current.keys) && current.keys[idx] == key {
@@ -169,7 +170,7 @@ func (tree *BTree) delete(current *BTreeNode, key int) {
 	tree.delete(current.childrens[min(idx, len(current.childrens)-1)], key)
 }
 
-func (tree *BTree) fill(current *BTreeNode, idx int) {
+func (tree *BTree[T]) fill(current *BTreeNode[T], idx int) {
 	if idx > 0 && len(current.childrens[idx-1].keys) >= t {
 		tree.borrowFromPred(current, idx)
 		return
@@ -181,14 +182,14 @@ func (tree *BTree) fill(current *BTreeNode, idx int) {
 	}
 }
 
-func (tree *BTree) borrowFromPred(current *BTreeNode, idx int) {
+func (tree *BTree[T]) borrowFromPred(current *BTreeNode[T], idx int) {
 	child := current.childrens[idx]
 	prev := current.childrens[idx-1]
 
 	// Borrow
 	child.keys = append([]int{current.keys[idx-1]}, child.keys...)
 	if len(prev.childrens) > 0 {
-		child.childrens = append([]*BTreeNode{prev.childrens[len(prev.childrens)-1]}, child.childrens...)
+		child.childrens = append([]*BTreeNode[T]{prev.childrens[len(prev.childrens)-1]}, child.childrens...)
 	}
 
 	// Change key of parent
@@ -204,7 +205,7 @@ func (tree *BTree) borrowFromPred(current *BTreeNode, idx int) {
 	}
 }
 
-func (tree *BTree) borrowFromSucc(current *BTreeNode, idx int) {
+func (tree *BTree[T]) borrowFromSucc(current *BTreeNode[T], idx int) {
 	child := current.childrens[idx]
 	next := current.childrens[idx+1]
 
@@ -227,7 +228,7 @@ func (tree *BTree) borrowFromSucc(current *BTreeNode, idx int) {
 	}
 }
 
-func (tree *BTree) findKey(current *BTreeNode, key int) int {
+func (tree *BTree[T]) findKey(current *BTreeNode[T], key int) int {
 	idx := 0
 	for idx < len(current.keys) && current.keys[idx] < key {
 		idx++
@@ -236,7 +237,7 @@ func (tree *BTree) findKey(current *BTreeNode, key int) int {
 	return idx
 }
 
-func (tree *BTree) removeFromLeaf(current *BTreeNode, idx int) {
+func (tree *BTree[T]) removeFromLeaf(current *BTreeNode[T], idx int) {
 	if !current.isLeaf {
 		panic("Should be leaf")
 	}
@@ -247,7 +248,7 @@ func (tree *BTree) removeFromLeaf(current *BTreeNode, idx int) {
 	current.keys = current.keys[:len(current.keys)-1]
 }
 
-func (tree *BTree) getPredecessor(current *BTreeNode) int {
+func (tree *BTree[T]) getPredecessor(current *BTreeNode[T]) int {
 	for !current.isLeaf {
 		current = current.childrens[len(current.childrens)-1]
 	}
@@ -255,7 +256,7 @@ func (tree *BTree) getPredecessor(current *BTreeNode) int {
 	return current.keys[len(current.keys)-1]
 }
 
-func (tree *BTree) getSuccessor(current *BTreeNode) int {
+func (tree *BTree[T]) getSuccessor(current *BTreeNode[T]) int {
 	for !current.isLeaf {
 		current = current.childrens[0]
 	}
@@ -263,7 +264,7 @@ func (tree *BTree) getSuccessor(current *BTreeNode) int {
 	return current.keys[0]
 }
 
-func (tree *BTree) removeFromNonLeaf(current *BTreeNode, idx int) {
+func (tree *BTree[T]) removeFromNonLeaf(current *BTreeNode[T], idx int) {
 	if current.isLeaf {
 		panic("Should be non leaf")
 	}
@@ -290,7 +291,7 @@ func (tree *BTree) removeFromNonLeaf(current *BTreeNode, idx int) {
 	tree.delete(current, key)
 }
 
-func (tree *BTree) merge(current *BTreeNode, idx int) {
+func (tree *BTree[T]) merge(current *BTreeNode[T], idx int) {
 	// Merge both childrens together
 	c1 := current.childrens[idx]
 	c2 := current.childrens[idx+1]
@@ -308,11 +309,11 @@ func (tree *BTree) merge(current *BTreeNode, idx int) {
 	current.childrens = append(current.childrens[:idx], current.childrens[idx+1:]...)
 }
 
-func (tree *BTree) Size() int {
+func (tree *BTree[T]) Size() int {
 	return tree.size(tree.root)
 }
 
-func (tree *BTree) size(current *BTreeNode) int {
+func (tree *BTree[T]) size(current *BTreeNode[T]) int {
 	if current == nil {
 		return 0
 	}

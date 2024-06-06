@@ -35,6 +35,8 @@ func (avl *avl) insert(current *avlNode, value int) *avlNode {
 		current.left = avl.insert(current.left, value)
 	} else if current.value < value {
 		current.right = avl.insert(current.right, value)
+	} else {
+		return current
 	}
 
 	// Update height here
