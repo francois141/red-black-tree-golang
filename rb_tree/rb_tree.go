@@ -2,6 +2,7 @@ package rb_tree
 
 import (
 	"errors"
+	"fmt"
 	"golang.org/x/exp/constraints"
 )
 
@@ -39,7 +40,7 @@ func (rbTree *RBTree[T]) InorderTraversal(node *RBNode[T]) {
 	}
 
 	rbTree.InorderTraversal(node.Left)
-	//fmt.Printf("%d ", *node.Data)
+	fmt.Printf("%d ", *node.Data)
 	rbTree.InorderTraversal(node.Right)
 }
 
