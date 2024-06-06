@@ -6,11 +6,11 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	assert.NotNil(t, New())
+	assert.NotNil(t, New[int]())
 }
 
 func TestInsert(t *testing.T) {
-	tree := New()
+	tree := New[int]()
 
 	size := 2000
 	for i := 0; i < size; i++ {
@@ -21,7 +21,7 @@ func TestInsert(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	tree := New()
+	tree := New[int]()
 
 	size := 20000
 	for i := 0; i < size; i++ {
@@ -35,7 +35,7 @@ func TestDelete(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-	tree := New()
+	tree := New[int]()
 
 	size := 20000
 	for i := 0; i < size; i++ {

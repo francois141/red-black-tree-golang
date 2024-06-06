@@ -1,31 +1,33 @@
 package avl_tree
 
+import "golang.org/x/exp/constraints"
+
 // TODO: Make this data structure generic
-type avlNode struct {
-	left   *avlNode
-	right  *avlNode
+type avlNode[T constraints.Ordered] struct {
+	left   *avlNode[T]
+	right  *avlNode[T]
 	value  int
 	height int
 }
 
-type avl struct {
-	root *avlNode
+type avl[T constraints.Ordered] struct {
+	root *avlNode[T]
 }
 
-func New() *avl {
-	return &avl{
+func New[T constraints.Ordered]() *avl[T] {
+	return &avl[T]{
 		root: nil,
 	}
 }
 
-func (avl *avl) Insert(value int) {
+func (avl *avl[T]) Insert(value int) {
 	avl.root = avl.insert(avl.root, value)
 }
 
-func (avl *avl) insert(current *avlNode, value int) *avlNode {
+func (avl *avl[T]) insert(current *avlNode[T], value int) *avlNode[T] {
 	// Pure insertion phase
 	if current == nil {
-		return &avlNode{
+		return &avlNode[T]{
 			left:   nil,
 			right:  nil,
 			value:  value,
@@ -64,7 +66,7 @@ func (avl *avl) insert(current *avlNode, value int) *avlNode {
 	return current
 }
 
-func (avl *avl) getHeight(current *avlNode) int {
+func (avl *avl[T]) getHeight(current *avlNode[T]) int {
 	if current == nil {
 		return 0
 	} else {
@@ -72,11 +74,11 @@ func (avl *avl) getHeight(current *avlNode) int {
 	}
 }
 
-func (avl *avl) getBalanceFactor(current *avlNode) int {
+func (avl *avl[T]) getBalanceFactor(current *avlNode[T]) int {
 	return avl.getHeight(current.left) - avl.getHeight(current.right)
 }
 
-func (avl *avl) leftRotate(current *avlNode) *avlNode {
+func (avl *avl[T]) leftRotate(current *avlNode[T]) *avlNode[T] {
 	// Perform the rotation
 	x := current
 	y := current.right
@@ -91,7 +93,7 @@ func (avl *avl) leftRotate(current *avlNode) *avlNode {
 	return y
 }
 
-func (avl *avl) rightRotate(current *avlNode) *avlNode {
+func (avl *avl[T]) rightRotate(current *avlNode[T]) *avlNode[T] {
 	// Perform the rotation
 	x := current
 	y := current.left
@@ -105,11 +107,11 @@ func (avl *avl) rightRotate(current *avlNode) *avlNode {
 	return y
 }
 
-func (avl *avl) Delete(value int) {
+func (avl *avl[T]) Delete(value int) {
 	avl.root = avl.delete(avl.root, value)
 }
 
-func (avl *avl) nextValue(current *avlNode, value int) int {
+func (avl *avl[T]) nextValue(current *avlNode[T], value int) int {
 	for current.left != nil {
 		current = current.left
 	}
@@ -117,7 +119,7 @@ func (avl *avl) nextValue(current *avlNode, value int) int {
 	return current.value
 }
 
-func (avl *avl) delete(current *avlNode, value int) *avlNode {
+func (avl *avl[T]) delete(current *avlNode[T], value int) *avlNode[T] {
 	if current == nil {
 		return current
 	} else if value < current.value {
@@ -165,11 +167,11 @@ func (avl *avl) delete(current *avlNode, value int) *avlNode {
 	return current
 }
 
-func (avl *avl) Find(value int) bool {
+func (avl *avl[T]) Find(value int) bool {
 	return avl.find(avl.root, value)
 }
 
-func (avl *avl) find(current *avlNode, value int) bool {
+func (avl *avl[T]) find(current *avlNode[T], value int) bool {
 	if current == nil {
 		return false
 	}
@@ -183,11 +185,11 @@ func (avl *avl) find(current *avlNode, value int) bool {
 	}
 }
 
-func (avl *avl) Size() int {
+func (avl *avl[T]) Size() int {
 	return avl.size(avl.root)
 }
 
-func (avl *avl) size(current *avlNode) int {
+func (avl *avl[T]) size(current *avlNode[T]) int {
 	if current == nil {
 		return 0
 	}
