@@ -27,7 +27,7 @@ func NewFibHeap() *FibHeap {
 	return &FibHeap{}
 }
 
-func (fibHeap *FibHeap) Insert(key int) {
+func (fibHeap *FibHeap) Push(key int) {
 	// Create a node
 	node := &FibNode{key: key}
 	node.left = node
@@ -55,7 +55,7 @@ func (fibHeap *FibHeap) insertRootList(node *FibNode) {
 	}
 }
 
-func (fibHeap *FibHeap) Minimum() (int, error) {
+func (fibHeap *FibHeap) ViewTop() (int, error) {
 	if fibHeap.rootList == nil {
 		return 0, errors.New("empty fibonacci heap")
 	}
@@ -81,9 +81,9 @@ func (fibHeap *FibHeap) Union(other *FibHeap) {
 	fibHeap.n += other.n
 }
 
-func (fibHeap *FibHeap) ExtractMinimum() *FibNode {
+func (fibHeap *FibHeap) Pop() (int, error) {
 	if fibHeap.min == nil {
-		return nil
+		return 0, errors.New("heap is empty")
 	}
 
 	minimumNode := fibHeap.min
@@ -108,7 +108,11 @@ func (fibHeap *FibHeap) ExtractMinimum() *FibNode {
 
 	fibHeap.n--
 
-	return minimumNode
+	return minimumNode.key, nil
+}
+
+func (fibHeap *FibHeap) Size() int {
+	return fibHeap.n
 }
 
 func (fibHeap *FibHeap) consolidate() {
@@ -134,7 +138,7 @@ func (fibHeap *FibHeap) consolidate() {
 	}
 
 	for _, node := range buffer {
-		if node != nil && node.key < fibHeap.min.key {
+		if node != nil && node.key <= fibHeap.min.key {
 			fibHeap.min = node
 		}
 	}

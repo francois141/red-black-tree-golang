@@ -2,7 +2,6 @@ package avl_tree
 
 import "golang.org/x/exp/constraints"
 
-// TODO: Make this data structure generic
 type avlNode[T constraints.Ordered] struct {
 	left   *avlNode[T]
 	right  *avlNode[T]
